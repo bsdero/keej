@@ -2,6 +2,7 @@
 
 import xcffib
 import xcffib.xproto
+import cairocffi.xcb
 import cairocffi
 import time
 
@@ -27,7 +28,7 @@ events = [screen.black_pixel,
 conn.core.CreateWindow( screen.root_depth, # color depth
                         window_id,
                         screen.root,       # root window
-                        0, 0, 200, 200,    # x,y,w,h
+                        40, 40, 100, 100,    # x,y,w,h
                         1,                 # border
                         xcffib.xproto.WindowClass.InputOutput, # window class
                         screen.root_visual, #visual
@@ -52,26 +53,29 @@ conn.core.CreateWindow( screen.root_depth, # color depth
                         window_deco_id,
                         screen.root,       # root window
                         0, 0, 200, 200,    # x,y,w,h
-                        5,                 # border
+                        10,                 # border
                         xcffib.xproto.WindowClass.InputOutput, # window class
                         screen.root_visual, #visual
                         xcffib.xproto.CW.BackPixel |
                         xcffib.xproto.CW.EventMask, # mask
                         events)
 
-surface = cairocffi.XCBSurface (conn, window_deco_id,
+surface = cairocffi.xcb.XCBSurface (conn, window_deco_id,
                                 screen.allowed_depths[0].visuals[0],
-                                200, 200)
+                                400, 400)
 context = cairocffi.Context(surface)
 
-context.set_source_rgba( 0, 1, 1, 1)
-
-context.rectangle( 20, 20, 40, 40)
-context.fill()
+context.set_source_rgb( 0.5, 0.5, 0.5)
+context.paint()
+#context.new_path()
+#context.rectangle( 0, 0, 400, 400)
+#context.fill()
 surface.flush()
-conn.core.ReparentWindow( window_id, window_deco_id, 0, 5)
+conn.core.ReparentWindow( window_id, window_deco_id, 50, 50)
 conn.core.MapWindow(window_id)
 conn.core.MapWindow(window_deco_id)
+conn.flush()
+surface.flush()
 conn.flush()
 time.sleep( 2)
 
